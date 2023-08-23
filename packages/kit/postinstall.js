@@ -1,8 +1,7 @@
 import fs from 'node:fs';
-import path from 'node:path';
 import { load_config } from './src/core/config/index.js';
-import { list_files } from './src/core/utils.js';
 import * as sync from './src/core/sync/sync.js';
+import { globby } from 'globby';
 
 try {
 	const cwd = process.env.INIT_CWD ?? process.cwd();
@@ -18,7 +17,7 @@ try {
 			const packages = Array.isArray(pkg.workspaces) ? pkg.workspaces : pkg.workspaces.packages;
 
 			for (const directory of packages) {
-				directories.push(...list_files(directory).map((dir) => path.resolve(cwd, dir)));
+				directories.push(...(await globby(directory, { onlyDirectories: true, absolute: true })))
 			}
 		} else {
 			directories.push(cwd);
